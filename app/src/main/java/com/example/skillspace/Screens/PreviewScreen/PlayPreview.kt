@@ -49,7 +49,8 @@ import com.example.skillspace.R
 data class PlaylistVideo(
     val title: String,
     val duration: String,
-    val isCompleted: Boolean = false
+    val isCompleted: Boolean = false,
+    val videoUrl: String = ""
 )
 
 data class SkillTrackPlaylist(
@@ -57,7 +58,8 @@ data class SkillTrackPlaylist(
     val playlistName: String,
     val thumbnailUrl: String,
     val progress: Float, // 0.0 to 1.0
-    val videos: List<PlaylistVideo>
+    val videos: List<PlaylistVideo>,
+    val playlistUrl: String = ""
 )
 
 val samplePlaylist = SkillTrackPlaylist(
@@ -65,14 +67,21 @@ val samplePlaylist = SkillTrackPlaylist(
     playlistName = "Jetpack Compose for Beginners",
     thumbnailUrl = "",
     progress = 0.35f,
+    playlistUrl = "https://www.youtube.com/watch?v=4O56p2h9Srw&list=PLUhfM8afLE_MOoV5jIAj4UTJ3o43LEmoc",
     videos = listOf(
-        PlaylistVideo("Introduction to Compose", "12:45", true),
-        PlaylistVideo("Layouts and Modifiers", "25:10", true),
-        PlaylistVideo("State Management", "45:20"),
-        PlaylistVideo("Navigation in Compose", "18:30"),
-        PlaylistVideo("Working with Side Effects", "30:00"),
-        PlaylistVideo("Theming and Styling", "22:15")
-    )
+        PlaylistVideo("Introduction to Compose", "12:45", true, "https://youtu.be/4O56p2h9Srw?si=3D42DDsBp07Worbg"),
+        PlaylistVideo("Layouts and Modifiers", "55:10", true, "https://youtu.be/o43PPMtcEVw?si=Ms9E5TC9gHIaG0hf"),
+        PlaylistVideo("Theming and Styling", "1:27:00", false, "https://youtu.be/C8_02p6hHCo?si=dBW0U0XBnyJXjPXO"),
+        PlaylistVideo("State Management", "27:47", false, "https://youtu.be/7-0RxNIRogM?si=2qV9qJGOQcYEdmBP"),
+        PlaylistVideo("Navigation in Compose", "51:30", false, "https://youtu.be/YChaBzMG5Fc?si=f1Nc56-mmK5-NVyY"),
+        PlaylistVideo("Implementing LazyLists & Navigation Bar", "1:42:02", false, "https://youtu.be/PdxFAvMxKdw?si=wO6eYFmobLf8BIkw"),
+        PlaylistVideo("Android Basics - All concepts", "1:20:12", false, "https://youtu.be/OfK9vLMQEH4?si=4Iy4eVIbzj9WaRh0"),
+        PlaylistVideo("Shared preferences", "28:54", false, "https://youtu.be/C7-E3zqq--0?si=KCy3PhAcL9J9UTZb"),
+        PlaylistVideo("Room Database & MVVM - ToDo List app", "2:02:17", false, "https://youtu.be/bY35GSplllo?si=0TlLe-J2erLR4u-u"),
+        PlaylistVideo("Learn Dependency Injection with Hilt", "26:29", false, "https://youtu.be/3nBS3F8CxgE?si=h_YZE1uNlSIJNU_C"),
+        PlaylistVideo("Recipe App part - API integration using Ktor", "3:20:02", false, "https://youtu.be/OfK9vLMQEH4?si=4Iy4eVIbzj9WaRh0"),
+        PlaylistVideo("Firebase in Android app", "1:27:45", false, "https://youtu.be/4m-Wm3JsG84?si=F_ae2Qh8M8MbT2sk"),
+        )
 )
 
 @Composable
@@ -80,9 +89,16 @@ fun PlayPreview(
     navController: NavHostController? = null,
     playlist: SkillTrackPlaylist = samplePlaylist
 ) {
+    val context = LocalContext.current
+
     PlaylistPreview(
         playlist = playlist,
-        onVideoClick = {}
+        onVideoClick = { video ->
+            if (video.videoUrl.isNotEmpty()) {
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(video.videoUrl))
+                context.startActivity(intent)
+            }
+        }
     )
 }
 
@@ -136,10 +152,13 @@ fun PlaylistPreview(
                             ) {
                                 IconButton(
                                     onClick = {
-                                        val intent = Intent(Intent.ACTION_VIEW)
-                                        intent.data =
-                                            Uri.parse("https://www.youtube.com/watch?v=4O56p2h9Srw&list=PLUhfM8afLE_MOoV5jIAj4UTJ3o43LEmoc&pp=0gcJCf4COCosWNin")
-                                        context.startActivity(intent)
+                                        val targetUrl = playlist.playlistUrl.ifEmpty {
+                                            playlist.videos.firstOrNull()?.videoUrl.orEmpty()
+                                        }
+                                        if (targetUrl.isNotEmpty()) {
+                                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(targetUrl))
+                                            context.startActivity(intent)
+                                        }
                                     }
                                 ) {
                                     Icon(
@@ -290,12 +309,18 @@ fun PreviewScreen() {
         thumbnailUrl = "",
         progress = 0.35f,
         videos = listOf(
-            PlaylistVideo("Introduction to Compose", "12:45", true),
-            PlaylistVideo("Layouts and Modifiers", "25:10", true),
-            PlaylistVideo("State Management", "45:20"),
-            PlaylistVideo("Navigation in Compose", "18:30"),
-            PlaylistVideo("Working with Side Effects", "30:00"),
-            PlaylistVideo("Theming and Styling", "22:15")
+            PlaylistVideo("Introduction to Compose", "12:45", true, "https://youtu.be/4O56p2h9Srw?si=3D42DDsBp07Worbg"),
+            PlaylistVideo("Layouts and Modifiers", "55:10", true, "https://youtu.be/o43PPMtcEVw?si=Ms9E5TC9gHIaG0hf"),
+            PlaylistVideo("Theming and Styling", "1:27:00", false, "https://youtu.be/C8_02p6hHCo?si=dBW0U0XBnyJXjPXO"),
+            PlaylistVideo("State Management", "27:47", false, "https://youtu.be/7-0RxNIRogM?si=2qV9qJGOQcYEdmBP"),
+            PlaylistVideo("Navigation in Compose", "51:30", false, "https://youtu.be/YChaBzMG5Fc?si=f1Nc56-mmK5-NVyY"),
+            PlaylistVideo("Implementing LazyLists & Navigation Bar", "1:42:02", false, "https://youtu.be/PdxFAvMxKdw?si=wO6eYFmobLf8BIkw"),
+            PlaylistVideo("Android Basics - All concepts", "1:20:12", false, "https://youtu.be/OfK9vLMQEH4?si=4Iy4eVIbzj9WaRh0"),
+            PlaylistVideo("Shared preferences", "28:54", false, "https://youtu.be/C7-E3zqq--0?si=KCy3PhAcL9J9UTZb"),
+            PlaylistVideo("Room Database & MVVM - ToDo List app", "2:02:17", false, "https://youtu.be/bY35GSplllo?si=0TlLe-J2erLR4u-u"),
+            PlaylistVideo("Learn Dependency Injection with Hilt", "26:29", false, "https://youtu.be/3nBS3F8CxgE?si=h_YZE1uNlSIJNU_C"),
+            PlaylistVideo("Recipe App part - API integration using Ktor", "3:20:02", false, "https://youtu.be/OfK9vLMQEH4?si=4Iy4eVIbzj9WaRh0"),
+            PlaylistVideo("Firebase in Android app", "1:27:45", false, "https://youtu.be/4m-Wm3JsG84?si=F_ae2Qh8M8MbT2sk"),
         )
     )
 

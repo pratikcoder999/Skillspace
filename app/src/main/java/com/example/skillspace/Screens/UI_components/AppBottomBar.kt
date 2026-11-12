@@ -33,7 +33,6 @@ fun AppBottomBar(navController: NavHostController) {
         containerColor = Color.DarkGray,
         modifier = Modifier.height(119.dp)
     ) {
-
         val itemColors = NavigationBarItemDefaults.colors(
             selectedIconColor = DeepOrange,   // Color when selected
             unselectedIconColor = Color.LightGray,  // Color when not selected
